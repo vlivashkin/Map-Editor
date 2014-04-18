@@ -13,7 +13,7 @@
 
 		public function __construct() {
 			if(isset($_SESSION['name']) && isset($_SESSION['password'])) {
-				$this->connect = new mysqli("localhost", "root", "ohlnj8Etf0NJ04yy", "map_editor");
+				$this->connect = new mysqli("localhost", "root", "root", "map_editor");
 				$this->user_id = $this->connect->query("SELECT `user_id` FROM `users` WHERE `e-mail` = '".$_SESSION['name']."' AND `pass` = '".$_SESSION['password']."'")->fetch_array(MYSQLI_ASSOC)['user_id'];
 				$result = $this->connect->query("SELECT folder_id, folder_name, description FROM folders WHERE main = '1' AND owner_id = '".$this->user_id."'");
 

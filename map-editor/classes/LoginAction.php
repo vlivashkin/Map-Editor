@@ -20,7 +20,7 @@
 
 
 				$query = "SELECT * FROM `users` WHERE `e-mail` = '".$name."' AND `pass` = '".$password."'";
-				$mysqli = new mysqli("localhost", "root", "ohlnj8Etf0NJ04yy", "map_editor");
+				$mysqli = new mysqli("localhost", "root", "root", "map_editor");
 				$result = $mysqli->query("SELECT 'Hello, dear MySQL user!' AS _message FROM DUAL");
 
 				if($result->num_rows) {

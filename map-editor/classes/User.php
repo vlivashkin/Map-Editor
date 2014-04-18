@@ -12,7 +12,7 @@
 			session_start();
 			if(isset($_SESSION['name']) && isset($_SESSION['password'])) {
 				$query = "SELECT `user_id`, `e-mail`, `fullname` FROM `users` WHERE `e-mail` = '".$_SESSION['name']."' AND `pass` = '".$_SESSION['password']."'";
-				$mysqli = new mysqli("localhost", "root", "ohlnj8Etf0NJ04yy", "map_editor");
+				$mysqli = new mysqli("localhost", "root", "root", "map_editor");
 				$result = $mysqli->query($query);
 
 				$user = $result->fetch_array(MYSQLI_ASSOC);
