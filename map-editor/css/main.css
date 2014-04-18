@@ -1,6 +1,6 @@
 html, body {
-	margin: 0;
-	padding: 0;
+    margin: 0;
+    padding: 0;
 }
 
 /*ul#folder-tree {
@@ -28,17 +28,15 @@ html, body {
 */
 
 #folder-tree {
-	position: relative;
-	width: auto;
-	height: auto;
-	margin: 70px 0 0 20px;
-	padding: 0;
+    position: relative;
+    width: auto;
+    height: auto;
+    margin: 70px 0 0 20px;
+    padding: 0;
 }
 
-
-
 .tree, .tree ul {
-	font-size: 22px;
+    font-size: 22px;
     margin: 0;
     padding: 3px 0 0 7px;
     list-style: none;
@@ -57,7 +55,7 @@ html, body {
 }
 
 .tree li .description {
-	font-size: 12px;
+    font-size: 12px;
 }
 
 .tree ul.opened {
@@ -70,7 +68,7 @@ html, body {
     position: relative;
     text-decoration: none;
     padding: 1px 0 1px 28px;
-    background-repeat: no-repeat;  
+    background-repeat: no-repeat;
 }
 
 .tree a:before {
@@ -89,7 +87,7 @@ html, body {
 }
 
 .tree a.harFull.harOpen:before {
-    border:0;
+    border: 0;
     border-left: 3px solid transparent;
     border-top: 4px solid #555;
     border-right: 3px solid transparent;
@@ -97,18 +95,21 @@ html, body {
 }
 
 .tree a.harFull:before {
-    border:0;
+    border: 0;
     border-top: 3px solid transparent;
     border-left: 4px solid #555;
     border-bottom: 3px solid transparent;
     top: 12px;
 }
+
 .tree a:hover {
     text-decoration: underline;
 }
+
 .tree a.cur {
-  color: #000
+    color: #000
 }
+
 .tree a.harOpen {
-  color: #000
+    color: #000
 }

@@ -1,59 +1,59 @@
 html {
-	height: 100%;
-	margin: 0;
-	padding: 0;
+    height: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 body {
-	height: 100%;
-	margin: 0;
-	padding: 0;
-} 
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
 
 #map-canvas {
-	height: 100%;
+    height: 100%;
 }
 
 #menu-panel {
-	text-align: right;
-	position: absolute;
-	right: 0;
-	bottom: 0;
-	margin-bottom: -42px;
-	margin-right: 45px;
-	z-index: 5;
-	width: 303px;
-	height: 35px;	
-	min-height: 35px;
-	overflow-y: hidden;
-	overflow-x: hidden;
-	font-size: 14px;
-	font-family: Arial;
+    text-align: right;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    margin-bottom: -42px;
+    margin-right: 45px;
+    z-index: 5;
+    width: 303px;
+    height: 35px;
+    min-height: 35px;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    font-size: 14px;
+    font-family: Arial;
 }
 
 #editing-panel {
-	position: absolute;
-	margin: 0;
-	height: 100%;
-	width: 60px;
-	left: 0;
-	background-color: #eee;
-	border-right: 1px solid #bbb;
-	-webkit-box-shadow: 3px 0px 10px 0px rgba(50, 50, 50, 0.15);
-	-moz-box-shadow:    3px 0px 10px 0px rgba(50, 50, 50, 0.15);
-	box-shadow:         3px 0px 10px 0px rgba(50, 50, 50, 0.15);
-	z-index: 10;
-	/*display: none;*/
+    position: absolute;
+    margin: 0;
+    height: 100%;
+    width: 60px;
+    left: 0;
+    background-color: #eee;
+    border-right: 1px solid #bbb;
+    -webkit-box-shadow: 3px 0px 10px 0px rgba(50, 50, 50, 0.15);
+    -moz-box-shadow: 3px 0px 10px 0px rgba(50, 50, 50, 0.15);
+    box-shadow: 3px 0px 10px 0px rgba(50, 50, 50, 0.15);
+    z-index: 10;
+    /*display: none;*/
 }
 
 #editing-panel button {
-	margin: 5px 0 0 10px;
+    margin: 5px 0 0 10px;
 }
 
 #editing-panel hr {
-	width: 45px;
-	height: 1px;
-	border: none;
-	border-bottom: 1px solid #d1d1d1 !important;
+    width: 45px;
+    height: 1px;
+    border: none;
+    border-bottom: 1px solid #d1d1d1 !important;
 
 }

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="dataSourceStorage">
+  <data-source source="LOCAL" name="MySQL - map_editor@localhost" uuid="038d1e8e-3d5b-45cc-9b29-e65bffc8bf4f">
+    <database-info product="MySQL" version="5.5.37" jdbc-version="4.0" driver-name="MySQL Connector Java" driver-version="mysql-connector-java-5.1.29 ( Revision: alexander.soklakov@oracle.com-20140120140810-s44574olh90i6i4l )">
+      <extra-name-characters>#@</extra-name-characters>
+      <identifier-quote-string>`</identifier-quote-string>
+    </database-info>
+    <case-sensitivity plain-identifiers="lower" quoted-identifiers="lower"/>
+    <schema name="" catalog="map_editor"/>
+    <table name="folders" schema="" catalog="map_editor" type="TABLE">
+      <column name="folder_id" sqlType="INT" length="10" precision="0" nullable="false" jdbcType="4" autoIncrement="true"/>
+      <column name="folder_name" sqlType="VARCHAR" length="50" precision="0" nullable="false" jdbcType="12"/>
+      <column name="description" sqlType="VARCHAR" length="200" precision="0" nullable="false" jdbcType="12"/>
+      <column name="public" sqlType="TINYINT" length="3" precision="0" nullable="false" jdbcType="-6" def="MA=="/>
+      <column name="owner_id" sqlType="INT" length="10" precision="0" nullable="false" jdbcType="4"/>
+      <column name="parent_id" sqlType="INT" length="10" precision="0" nullable="false" jdbcType="4"/>
+      <column name="main" sqlType="TINYINT" length="3" precision="0" nullable="false" jdbcType="-6" def="MA=="/>
+      <primary-key name="PRIMARY" columns="folder_id"/>
+      <foreign-key name="folders_ibfk_1" columns="owner_id" ref-table="users" ref-schema="" ref-catalog="map_editor" ref-columns="user_id" update-rule="3" delete-rule="3" deferrability="2"/>
+      <exported-key name="layers_ibfk_2" table="layers" schema="" catalog="map_editor" columns="folder_id"/>
+      <index name="folder_id" unique="true" columns="folder_id"/>
+      <index name="parent_id" unique="false" columns="parent_id"/>
+    </table>
+    <table name="layers" schema="" catalog="map_editor" type="TABLE">
+      <column name="layer_id" sqlType="INT" length="10" precision="0" nullable="false" jdbcType="4" autoIncrement="true"/>
+      <column name="layer_name" sqlType="VARCHAR" length="150" precision="0" nullable="false" jdbcType="12"/>
+      <column name="description" sqlType="VARCHAR" length="200" precision="0" nullable="false" jdbcType="12"/>
+      <column name="public" sqlType="TINYINT" length="3" precision="0" nullable="false" jdbcType="-6" def="MA=="/>
+      <column name="owner_id" sqlType="INT" length="10" precision="0" nullable="false" jdbcType="4"/>
+      <column name="folder_id" sqlType="INT" length="10" precision="0" nullable="false" jdbcType="4"/>
+      <primary-key name="PRIMARY" columns="layer_id"/>
+      <foreign-key name="layers_ibfk_3" columns="owner_id" ref-table="users" ref-schema="" ref-catalog="map_editor" ref-columns="user_id" update-rule="3" delete-rule="3" deferrability="2"/>
+      <foreign-key name="layers_ibfk_2" columns="folder_id" ref-table="folders" ref-schema="" ref-catalog="map_editor" ref-columns="folder_id" update-rule="3" delete-rule="3" deferrability="2"/>
+      <exported-key name="objects_ibfk_1" table="objects" schema="" catalog="map_editor" columns="layer_id"/>
+      <index name="layer_id" unique="true" columns="layer_id"/>
+    </table>
+    <table name="objects" schema="" catalog="map_editor" type="TABLE">
+      <column name="object_id" sqlType="BIGINT" length="19" precision="0" nullable="false" jdbcType="-5" autoIncrement="true"/>
+      <column name="json" sqlType="BLOB" length="65535" precision="0" nullable="false" jdbcType="-4"/>
+      <column name="layer_id" sqlType="INT" length="10" precision="0" nullable="false" jdbcType="4"/>
+      <primary-key name="PRIMARY" columns="object_id"/>
+      <foreign-key name="objects_ibfk_1" columns="layer_id" ref-table="layers" ref-schema="" ref-catalog="map_editor" ref-columns="layer_id" update-rule="3" delete-rule="3" deferrability="2"/>
+      <index name="object_id" unique="true" columns="object_id"/>
+    </table>
+    <table name="users" schema="" catalog="map_editor" type="TABLE">
+      <column name="user_id" sqlType="INT" length="10" precision="0" nullable="false" jdbcType="4" autoIncrement="true"/>
+      <column name="e-mail" sqlType="VARCHAR" length="100" precision="0" nullable="false" jdbcType="12"/>
+      <column name="pass" sqlType="VARCHAR" length="50" precision="0" nullable="false" jdbcType="12"/>
+      <column name="fullname" sqlType="TEXT" length="65535" precision="0" nullable="false" jdbcType="-1"/>
+      <column name="picture" sqlType="TINYINT" length="3" precision="0" nullable="false" jdbcType="-6" def="MA=="/>
+      <primary-key name="PRIMARY" columns="user_id"/>
+      <exported-key name="folders_ibfk_1" table="folders" schema="" catalog="map_editor" columns="owner_id"/>
+      <exported-key name="layers_ibfk_3" table="layers" schema="" catalog="map_editor" columns="owner_id"/>
+      <index name="user_id" unique="true" columns="user_id"/>
+    </table>
+  </data-source>
+</component>
