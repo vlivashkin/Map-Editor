@@ -20,7 +20,32 @@ var mapOptions = {
 var map;
 var panoramio;
 
+/**
+ * Some useful functions
+ */
 
+/**
+ * Function to get user layer id from the url string
+ * like map.php?lid={id}
+ * @returns {id}
+ */
+function getLayerId() {
+    var id;
+    return id;
+}
+
+/**
+ * Save to DataBase functions
+ */
+
+function saveObjectToDB(object) {
+    $.ajax({
+        url: 'classes/saveObject.php',
+        type: 'POST',
+        data: {object: JSON.stringify(object, null, 2), layer_id: getLayerId()},
+        dataType: "text"
+    });
+}
 /**
  * Draw functions
  */
@@ -32,6 +57,8 @@ function addMarker(location, listener) {
         flat: false,
         map: map
     });
+
+    saveObjectToDB(marker);
 
     // google.maps.event.addListener(marker, 'dragend', function(event){
     // 	marker.setPosition(event.latLng)

@@ -12,10 +12,11 @@ class User
 
     public function __construct()
     {
+        require_once('SQLConfig.php');
         session_start();
         if (isset($_SESSION['name']) && isset($_SESSION['password'])) {
             $query = "SELECT `user_id`, `e-mail`, `fullname` FROM `users` WHERE `e-mail` = '" . $_SESSION['name'] . "' AND `pass` = '" . $_SESSION['password'] . "'";
-            $mysqli = new mysqli("localhost", "root", "root", "map_editor");
+            $mysqli = new mysqli(SQLConfig::SERVERNAME, SQLConfig::USER, SQLConfig::PASSWORD, SQLConfig::DATABASE);
             $result = $mysqli->query($query);
 
             $user = $result->fetch_array(MYSQLI_ASSOC);

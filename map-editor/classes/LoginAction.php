@@ -3,13 +3,11 @@
 class LoginAction
 {
     private $post;
-    private $db_connect;
 
     public function __construct($post)
     {
         $this->post = $post;
         require_once('SQLConfig.php');
-        $this->db_connect = (new SQLConfig())->connect();
     }
 
     public function signIn()
@@ -23,8 +21,8 @@ class LoginAction
 
 
             $query = "SELECT * FROM `users` WHERE `e-mail` = '" . $name . "' AND `pass` = '" . $password . "'";
-            $mysqli = new mysqli("localhost", "root", "root", "map_editor");
-            $result = $mysqli->query("SELECT 'Hello, dear MySQL user!' AS _message FROM DUAL");
+            $mysqli = new mysqli(SQLConfig::SERVERNAME, SQLConfig::USER, SQLConfig::PASSWORD, SQLConfig::DATABASE);
+            $result = $mysqli->query($query);
 
             if ($result->num_rows) {
                 session_start();
