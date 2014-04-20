@@ -1,3 +1,8 @@
+var map;
+var panoramio;
+var type;
+var figure;
+
 var mapOptions = {
     center: new google.maps.LatLng(-34.397, 150.644),
     zoom: 8,
@@ -17,12 +22,6 @@ var mapOptions = {
         position: google.maps.ControlPosition.RIGHT_BOTTOM
     }
 };
-var map;
-var panoramio;
-
-/**
- * Some useful functions
- */
 
 /**
  * Function to get user layer id from the url string
@@ -34,171 +33,188 @@ function getLayerId() {
     return id;
 }
 
-/**
- * Save to DataBase functions
- */
+function initialize() {
+    map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+    panoramio = new google.maps.panoramio.PanoramioLayer();
 
-function saveObjectToDB(object) {
-    $.ajax({
-        url: 'classes/saveObject.php',
-        type: 'POST',
-        data: {object: JSON.stringify(object, null, 2), layer_id: getLayerId()},
-        dataType: "text"
-    });
-}
-/**
- * Draw functions
- */
+    var menu = document.getElementById("menubar");
+    map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(menu);
 
-function addMarker(location, listener) {
-    var marker = new google.maps.Marker({
-        position: location,
-        draggable: true,
-        flat: false,
-        map: map
-    });
-
-    saveObjectToDB(marker);
-
-    // google.maps.event.addListener(marker, 'dragend', function(event){
-    // 	marker.setPosition(event.latLng)
-    // });
-}
-
-function drawPolyline(poly, location) {
-    path = new google.maps.MVCArray();
-    path = poly.getPath();
-    path.insertAt(path.length, location);
-    poly.setPath(path);
-}
-
-function drawPolygon(poly, location) {
-    path = new google.maps.MVCArray();
-    path = poly.getPath();
-    path.insertAt(path.length, location);
-    poly.setPath(path);
-}
-
-function drawRectangle(rectangle, location) {
-    points = new google.maps.LatLngBounds;
-    points = rectangle.getBounds().toString();
-    console.log(points);
-    // points.extend(location);
-    // rectangle.setBounds(points);
+    createListeners();
 }
 
 /**
  * Listeners
  */
 
-function listenPlaceMarkerButton() {
-    $("#marker").click(function () {
-        var listener = google.maps.event.addListenerOnce(map, 'click', function (event) {
-            addMarker(event.latLng, listener);
-        });
-    });
-}
-
-function listenAddPolylineButton() {
-    $("#polyline").click(function () {
-        var options = {
-            strokeColor: '#FF0000',
-            strokeOpacity: 1.0,
-            strokeWeight: 2,
-            editable: true,
-            map: map
-        };
-        var poly = new google.maps.Polyline(options);
-        poly.setMap(map);
-        // google.maps.event.addListener(poly, 'click', function(event) {
-        // 	// poly.setEditable(true);
-        // });
-        var listener = google.maps.event.addListener(map, 'click', function (event) {
-            drawPolyline(poly, event.latLng);
-        });
-    });
-}
-
-function listenAddPolygonButton() {
-    $("#polygon").click(function () {
-        var options = {
-            strokeColor: "#FF0000",
-            strokeOpacity: 0.8,
-            strokeWeight: 2,
-            fillColor: "#FF0000",
-            fillOpacity: 0.35,
-            editable: true,
-            map: map
-        };
-        var poly = new google.maps.Polygon(options);
-        poly.setMap(map);
-        // google.maps.event.addListener(poly, 'click', function(event) {
-        // 	// poly.setEditable(true);
-        // });
-        var listener = google.maps.event.addListener(map, 'click', function (event) {
-            drawPolygon(poly, event.latLng);
-        });
-    });
-}
-
-function listenAddRectangleButton() {
-    $("#rectangle").click(function () {
-        var options = {
-            strokeColor: "#FF0000",
-            strokeOpacity: 0.8,
-            strokeWeight: 2,
-            fillColor: "#FF0000",
-            fillOpacity: 0.35,
-            editable: true,
-            map: map
-        };
-        var rec = new google.maps.Rectangle(options);
-        rec.setMap(map);
-        // google.maps.event.addListener(poly, 'click', function(event) {
-        // 	// poly.setEditable(true);
-        // });
-        var listener = google.maps.event.addListener(map, 'click', function (event) {
-            drawRectangle(rec, event.latLng);
-        });
-    });
-}
-
 function createListeners() {
+    listenMenu();
+
+    listenEsc();
+
+    listenToolBtn("marker");
+    listenToolBtn("polyline");
+    listenToolBtn("polygon");
+    listenToolBtn("rectangle");
+}
+
+function listenMenu() {
     $("#zoom-in").click(function () {
         map.setZoom(map.getZoom() + 1);
     });
-
     $("#zoom-out").click(function () {
         map.setZoom(map.getZoom() - 1);
     });
-
     $("#panoramio").click(function () {
         if (panoramio.getMap() != null)
             panoramio.setMap(null);
         else
             panoramio.setMap(map);
     });
-
-    $("#edit").click(function () {
-        if ($("#editing-panel").css("display").localeCompare("none"))
-            $("#editing-panel").css("display", "none");
-        else
-            $("#editing-panel").css("display", "block");
+    $("#toolBtn").click(function () {
+        $("#toolbar").toggle();
     });
-
-    listenPlaceMarkerButton();
-    listenAddPolylineButton();
-    listenAddPolygonButton();
-    listenAddRectangleButton();
-
 }
 
-function initialize() {
-    map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
-    panoramio = new google.maps.panoramio.PanoramioLayer();
+function listenEsc() {
+    $(document).keyup(function (e) {
+        if (e.keyCode == 27) {
+            removeListeners();
+        }
+    });
+}
 
-    var menu = document.getElementById("menu-panel");
-    map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(menu);
+function listenToolBtn(btn) {
+    var $btn = $("#" + btn);
 
-    createListeners();
+    $btn.click(function () {
+        if (!$btn.hasClass("btn-primary")) {
+            var options = {
+                strokeColor: '#FF0000',
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: "#FF0000",
+                fillOpacity: 0.35,
+                clickable: false,
+                editable: true,
+                map: map
+            };
+
+            removeListeners();
+            $btn.addClass("btn-primary");
+            map.setOptions({draggableCursor: 'crosshair'});
+            type = btn;
+
+            switch (btn) {
+                case "marker" :
+                    google.maps.event.addListenerOnce(map, 'click', function (event) {
+                        addMarker(event.latLng);
+                    });
+                    break;
+                case "polyline" :
+                    strokeOpacity = 1.0;
+                    figure = new google.maps.Polyline(options);
+                    figure.setMap(map);
+                    google.maps.event.addListener(map, 'click', function (event) {
+                        drawPath(event.latLng);
+                    });
+                    break;
+                case "polygon" :
+                    figure = new google.maps.Polygon(options);
+                    figure.setMap(map);
+                    google.maps.event.addListener(map, 'click', function (event) {
+                        drawPath(event.latLng);
+                    });
+                    break;
+                case "rectangle" :
+                    var points = new google.maps.LatLngBounds();
+                    figure = new google.maps.Rectangle(options);
+                    figure.setMap(map);
+                    google.maps.event.addListenerOnce(map, 'click', function (event) {
+                        drawRect(event.latLng, points);
+                    });
+                    break;
+            }
+            google.maps.event.addListener(map, 'dblclick', function () {
+                removeListeners();
+            });
+        } else {
+            removeListeners();
+        }
+    });
+}
+
+function removeListeners() {
+    $(".btn-tool").removeClass("btn-primary");
+    google.maps.event.clearListeners(map, 'click');
+    map.setOptions({draggableCursor: null});
+    firstClick = false;
+
+    if (figure != null) {
+        saveObjectToDB(figure);
+        figure = null;
+    }
+}
+
+/**
+ * Draw functions
+ */
+
+function addMarker(location) {
+    figure = new google.maps.Marker({
+        position: location,
+        draggable: true,
+        flat: false,
+        map: map
+    });
+    removeListeners();
+}
+
+function drawPath(location) {
+    path = new google.maps.MVCArray();
+    path = figure.getPath();
+    path.insertAt(path.length, location);
+    figure.setPath(path);
+}
+
+function drawRect(location, points) {
+    if (points.isEmpty()) {
+        points.extend(location);
+        figure.setBounds(points);
+        google.maps.event.addListenerOnce(map, 'click', function (event) {
+            drawRect(event.latLng, points);
+        });
+    } else {
+        points.extend(location);
+        figure.setBounds(points);
+        removeListeners();
+    }
+}
+
+/**
+ * Save to DataBase functions
+ */
+
+function saveObjectToDB(object) {
+    var obj = {'type': type};
+    switch (type) {
+        case "marker" :
+            obj.points = object.getPosition();
+            break;
+        case "polyline" :
+        case "polygon" :
+            obj.points = object.getPath().j;
+            break;
+        case "rectangle" :
+            obj.points = object.getBounds();
+    }
+
+    console.log(obj);
+
+    $.ajax({
+        url: 'classes/saveObjects.php',
+        type: 'POST',
+        data: {object: JSON.stringify(obj), layer_id: getLayerId()},
+        dataType: 'json'
+    });
 }

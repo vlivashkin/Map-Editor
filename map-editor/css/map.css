@@ -14,7 +14,7 @@ body {
     height: 100%;
 }
 
-#menu-panel {
+#menubar {
     text-align: right;
     position: absolute;
     right: 0;
@@ -31,11 +31,11 @@ body {
     font-family: Arial;
 }
 
-#editing-panel {
+#toolbar {
     position: absolute;
     margin: 0;
     height: 100%;
-    width: 60px;
+    padding-right: 10px;
     left: 0;
     background-color: #eee;
     border-right: 1px solid #bbb;
@@ -46,14 +46,18 @@ body {
     /*display: none;*/
 }
 
-#editing-panel button {
-    margin: 5px 0 0 10px;
+#toolbar p {
+    margin: 0;
 }
 
-#editing-panel hr {
+#toolbar button {
+    margin: 3px 0 3px 10px;
+}
+
+#toolbar hr {
     width: 45px;
     height: 1px;
     border: none;
     border-bottom: 1px solid #d1d1d1 !important;
-
+    margin-right: -3px;
 }

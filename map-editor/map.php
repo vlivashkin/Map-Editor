@@ -15,89 +15,59 @@
 
 </head>
 <body onload="initialize()">
-<div id="editing-panel">
-    <div class="btn-group" style="margin: 10px 0 0 0">
-        <button id="marker" title="place a marker" type="button" class="btn btn-primary">
-            <span class="glyphicon glyphicon-map-marker"></span>
-        </button>
-    </div>
-    <div class="btn-group">
-        <button id="polyline" title="draw a polyline" type="button" class="btn btn-primary">
-            <span class="glyphicon glyphicon-flash"></span>
-        </button>
-    </div>
-    <div class="btn-group">
-        <button id="polygon" title="draw a polygon" type="button" class="btn btn-primary">
-            <span class="glyphicon glyphicon-stop"></span>
-        </button>
-    </div>
-    <div class="btn-group">
-        <button id="rectangle" title="draw a rectangle" type="button" class="btn btn-primary">
-            <span class="glyphicon glyphicon-retweet"></span>
-        </button>
-    </div>
-    <div class="btn-group">
-        <button id="circle" title="draw a circle" type="button" class="btn btn-primary">
-            <span class="glyphicon glyphicon-certificate"></span>
-        </button>
-    </div>
-    <div class="btn-group">
-        <button id="description" title="add a description" type="button" class="btn btn-primary">
-            <span class="glyphicon glyphicon-comment"></span>
-        </button>
-    </div>
-    <div class="btn-group">
-        <button title="attach a photo" type="button" class="btn btn-primary">
-            <span class="glyphicon glyphicon-camera"></span>
-        </button>
+<div id="toolbar">
+    <div style="margin: 10px 0 -10px 0">
+        <p>
+            <button id="marker" title="place a marker" type="button"
+                    class="btn btn-tool glyphicon glyphicon-map-marker"></button>
+        </p>
+        <p>
+            <button id="polyline" title="draw a polyline" type="button"
+                    class="btn btn-tool glyphicon glyphicon-flash"></button>
+        </p>
+        <p>
+            <button id="polygon" title="draw a polygon" type="button"
+                    class="btn btn-tool glyphicon glyphicon-stop"></button>
+        </p>
+        <p>
+            <button id="rectangle" title="draw a rectangle" type="button"
+                    class="btn btn-tool glyphicon glyphicon-retweet"></button>
+        </p>
+        <p>
+            <button disabled="disabled" id="circle" title="draw a circle" type="button"
+                    class="btn btn-tool glyphicon glyphicon-certificate"></button>
+        </p>
+        <p>
+            <button disabled="disabled" id="description" title="add a description" type="button"
+                    class="btn btn-tool glyphicon glyphicon-comment"></button>
+        </p>
+        <p>
+            <button disabled="disabled" id="photo" title="attach a photo" type="button"
+                    class="btn btn-tool glyphicon glyphicon-camera"></button>
     </div>
     <hr>
-    <div class="btn-group">
-        <button title="calculate the distance" type="button" class="btn btn-warning">
-            <span class="glyphicon glyphicon-resize-horizontal"></span>
-        </button>
+    <div style="margin: -10px 0 0 0">
+        <p>
+            <button disabled="disabled" title="calculate the distance" type="button"
+                    class="btn btn-warning glyphicon glyphicon-resize-horizontal"></button>
+        </p>
+        <p>
+            <button disabled="disabled" title="get point coordinates" type="button"
+                    class="btn btn-warning glyphicon glyphicon-screenshot"></button>
+        </p>
+        <p>
+            <button disabled="disabled" title="attach a photo" type="button"
+                    class="btn btn-warning glyphicon glyphicon-camera"></button>
+        </p>
     </div>
-    <div class="btn-group">
-        <button title="get point coordinates" type="button" class="btn btn-warning">
-            <span class="glyphicon glyphicon-screenshot"></span>
-        </button>
-    </div>
-    <div class="btn-group">
-        <button title="attach a photo" type="button" class="btn btn-warning">
-            <span class="glyphicon glyphicon-camera"></span>
-        </button>
-    </div>
-    <!-- <hr>
-    <div class="btn-group">
-        <button id="marker" title="place a marker" type="button" class="btn btn-success">
-          <span class="glyphicon glyphicon-ok-circle"></span>
-        </button>
-    </div>
-    <div class="btn-group">
-        <button id="polyline" title="draw a polyline" type="button" class="btn btn-danger">
-          <span class="glyphicon glyphicon-remove-circle"></span>
-        </button>
-    </div> -->
 </div>
 
-<div id="menu-panel">
+<div id="menubar">
+    <button id="toolBtn" type="button" class="btn btn-danger glyphicon glyphicon-pencil"></button>
+    <button id="panoramio" type="button" class="btn btn-primary glyphicon glyphicon-picture"></button>
     <div class="btn-group">
-        <button id="edit" type="button" class="btn btn-danger">
-            <span class="glyphicon glyphicon-pencil"></span>
-        </button>
-    </div>
-    <div class="btn-group">
-        <button id="panoramio" type="button" class="btn btn-primary">
-            <span class="glyphicon glyphicon-picture"></span>
-        </button>
-    </div>
-    <div class="btn-group">
-        <button id="zoom-out" type="button" class="btn btn-success">
-            <span class="glyphicon glyphicon-zoom-out"></span>
-        </button>
-        <button id="zoom-in" type="button" class="btn btn-success">
-            <span class="glyphicon glyphicon-zoom-in"></span>
-        </button>
+        <button id="zoom-out" type="button" class="btn btn-success glyphicon glyphicon-zoom-out"></button>
+        <button id="zoom-in" type="button" class="btn btn-success glyphicon glyphicon-zoom-in"></button>
     </div>
 </div>
 <div id="map-canvas"></div>
