@@ -6,11 +6,12 @@
     <link rel="StyleSheet" type="text/css" href="css/map.css"/>
     <link rel="stylesheet" href="css/bootstrap.min.css">
 
-    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=true&language=ru&libraries=places,panoramio,"
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=true&language=ru&libraries=places,panoramio,drawing"
             type="text/javascript"></script>
     <script src="js/map.js" type="text/javascript"></script>
     <script src="js/jquery.js" type="text/javascript"></script>
     <script src="js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="js/sessionstorage.js" type="text/javascript"></script>
     <title>Map</title>
 
 </head>
@@ -34,7 +35,7 @@
                     class="btn btn-tool glyphicon glyphicon-retweet"></button>
         </p>
         <p>
-            <button disabled="disabled" id="circle" title="draw a circle" type="button"
+            <button id="circle" title="draw a circle" type="button"
                     class="btn btn-tool glyphicon glyphicon-certificate"></button>
         </p>
         <p>
