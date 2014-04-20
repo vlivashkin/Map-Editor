@@ -11,7 +11,6 @@
     <script src="js/map.js" type="text/javascript"></script>
     <script src="js/jquery.js" type="text/javascript"></script>
     <script src="js/bootstrap.min.js" type="text/javascript"></script>
-    <script src="js/sessionstorage.js" type="text/javascript"></script>
     <title>Map</title>
 
 </head>
@@ -72,5 +71,10 @@
     </div>
 </div>
 <div id="map-canvas"></div>
+
+<ul id="dropdown-menu" class="dropdown-menu" role="menu">
+    <li role="presentation"><a id="dropdown-menu-a" role="menuitem" tabindex="-1" href="#">Delete marker</a></li>
+</ul>
+
 </body>
 </html>	
