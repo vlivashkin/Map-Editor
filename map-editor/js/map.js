@@ -4,6 +4,9 @@ var drawingManager;
 var menu;
 
 var figureList = {};
+var selected = {};
+
+var ctrlIsPressed = false;
 
 var tools = [
     {name: "marker", class: google.maps.drawing.OverlayType.MARKER},
@@ -87,10 +90,8 @@ function initialize() {
 function createListeners() {
     listenMenu();
     listenEsc();
-
     tools.forEach(listenToolBtn);
-
-    listenComplete();
+    listenFigureComplete();
 }
 
 function listenMenu() {
@@ -112,17 +113,24 @@ function listenMenu() {
 }
 
 function listenEsc() {
+    $(document).keydown(function(e) {
+        if (e.keyCode == 17)
+            ctrlIsPressed = true;
+    });
     $(document).keyup(function (e) {
         if (e.keyCode == 27) {
             closeTool();
-        }
+        } else if (e.keyCode == 17)
+            ctrlIsPressed = false;
     });
     google.maps.event.addListener(map, 'click', function () {
         $("#dropdown-menu").hide();
-        setEditableAll(false);
+        unSelect();
     });
     google.maps.event.addListener(map, 'rightclick', function () {
         closeTool();
+        $("#dropdown-menu").hide();
+        unSelect();
     });
 }
 
@@ -135,7 +143,7 @@ function listenToolBtn(tool) {
             drawingManager.setOptions({
                 drawingMode: tool.class
             });
-            setEditableAll(false);
+            unSelect();
             setClickableAll(false);
             $btn.addClass("btn-primary");
         } else {
@@ -153,7 +161,7 @@ function closeTool() {
     setClickableAll(true);
 }
 
-function listenComplete() {
+function listenFigureComplete() {
     google.maps.event.addListener(drawingManager, 'overlaycomplete', function (event) {
         var figure = event.overlay;
         var type = event.type;
@@ -161,20 +169,25 @@ function listenComplete() {
         tools.forEach(function (tool) {
             if (type == tool.class)
                 google.maps.event.addListener(figure, "rightclick", function (event) {
-                    showContextMenu(event.latLng, figure.__gm_id, tool.name);
+                    if (selected.length > 1)
+                        showContextMenu(event.latLng, "this objects: " + selected.length);
+                    else
+                        showContextMenu(event.latLng, tool.name);
                 });
         });
 
         google.maps.event.addListener(figure, "click", function () {
-            setEditableAll(false);
+            if (!ctrlIsPressed) {
+                unSelect();
+            }
             figure.setOptions({
                 editable: true,
                 draggable: true
             });
+            selected.push(figure);
         });
 
-        id = figure.__gm_id;
-        figureList[id] = figure;
+        figureList[figure.__gm_id] = figure;
 
         saveObjectToDB(type, figure);
     });
@@ -212,22 +225,23 @@ function saveObjectToDB(type, figure) {
     });
 }
 
-function delMarker(id) {
-    var marker = figureList[id];
-    marker.setMap(null);
+function delFigure() {
+    selected.forEach(function (figure) {
+        figure.setMap(null);
+    })
 }
 
 /**
  * Context menu
  */
 
-function showContextMenu(currentLatLng, id, name) {
+function showContextMenu(currentLatLng, name) {
     setMenuXY(currentLatLng);
     $("#dropdown-menu").show();
     var $dropdown = $('#dropdown-menu-a');
     $dropdown.text("Delete " + name);
     $dropdown.click(function () {
-        delMarker(id);
+        delFigure();
         $("#dropdown-menu").hide();
     });
 }
@@ -264,13 +278,12 @@ function setClickableAll(clickable) {
     });
 }
 
-function setEditableAll(editable) {
-    if (arguments.length == 0)
-        editable = true;
+function unSelect() {
     Object.keys(figureList).forEach(function (temp) {
         figureList[temp].setOptions({
-            editable: editable,
-            draggable: editable
+            editable: false,
+            draggable: false
         });
     });
+    selected = [];
 }
