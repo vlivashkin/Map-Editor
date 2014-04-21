@@ -286,6 +286,6 @@ function setEditableAll(editable) {
     if (arguments.length == 0)
         editable = true;
     Object.keys(figureList).forEach(function(temp) {
-        figureList[temp].setEditable(editable);
+        figureList[temp].setOptions({editable : editable});
     });
 }
