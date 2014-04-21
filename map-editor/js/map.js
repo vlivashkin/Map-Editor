@@ -5,6 +5,14 @@ var menu;
 
 var figureList = {};
 
+var tools = [
+    {name: "marker", class: google.maps.drawing.OverlayType.MARKER},
+    {name: "polyline", class: google.maps.drawing.OverlayType.POLYLINE},
+    {name: "polygon", class: google.maps.drawing.OverlayType.POLYGON},
+    {name: "rectangle", class: google.maps.drawing.OverlayType.RECTANGLE},
+    {name: "circle", class: google.maps.drawing.OverlayType.CIRCLE}
+];
+
 var mapOptions = {
     center: new google.maps.LatLng(-34.397, 150.644),
     zoom: 8,
@@ -80,14 +88,6 @@ function createListeners() {
     listenMenu();
     listenEsc();
 
-    var tools = [
-        {name: "marker", class: google.maps.drawing.OverlayType.MARKER},
-        {name: "polyline", class: google.maps.drawing.OverlayType.POLYLINE},
-        {name: "polygon", class: google.maps.drawing.OverlayType.POLYGON},
-        {name: "rectangle", class: google.maps.drawing.OverlayType.RECTANGLE},
-        {name: "circle", class: google.maps.drawing.OverlayType.CIRCLE}
-    ];
-
     tools.forEach(listenToolBtn);
 
     listenComplete();
@@ -158,42 +158,19 @@ function listenComplete() {
         var figure = event.overlay;
         var type = event.type;
 
-        if (type == google.maps.drawing.OverlayType.MARKER) {
-            google.maps.event.addListener(figure, "rightclick", function (event) {
-                showContextMenu(event.latLng, figure.__gm_id, "Delete figure");
-            });
-        } else if (type == google.maps.drawing.OverlayType.POLYLINE || type == google.maps.drawing.OverlayType.POLYGON) {
-            google.maps.event.addListener(figure, "insert_at", function (event) {
-                console.log(figure.__gm_id + " insert_at");
-                console.log(figure.getPath().getArray());
-            });
-            google.maps.event.addListener(figure, "remove_at", function (event) {
-                console.log(figure.__gm_id + " remove_at");
-                console.log(figure.getPath().getArray());
-            });
-            google.maps.event.addListener(figure, "set_at", function (event) {
-                console.log(figure.__gm_id + " set_at: ");
-                console.log(figure.getPath().getArray());
-            });
-        } else if (type == google.maps.drawing.OverlayType.RECTANGLE) {
-            google.maps.event.addListener(figure, "bounds_changed", function () {
-                console.log(figure.__gm_id + " bounds_changed:");
-                console.log(figure.getBounds());
-            });
-        } else if (type == google.maps.drawing.OverlayType.CIRCLE) {
-            google.maps.event.addListener(figure, "radius_changed", function () {
-                console.log(figure.__gm_id + " radius_changed:");
-                console.log(figure.getRadius());
-            });
-            google.maps.event.addListener(figure, "center_changed", function () {
-                console.log(figure.__gm_id + " center_changed:");
-                console.log(figure.getCenter());
-            });
-        }
+        tools.forEach(function (tool) {
+            if (type == tool.class)
+                google.maps.event.addListener(figure, "rightclick", function (event) {
+                    showContextMenu(event.latLng, figure.__gm_id, tool.name);
+                });
+        });
 
         google.maps.event.addListener(figure, "click", function () {
             setEditableAll(false);
-            figure.setEditable(true);
+            figure.setOptions({
+                editable: true,
+                draggable: true
+            });
         });
 
         id = figure.__gm_id;
@@ -229,7 +206,7 @@ function saveObjectToDB(type, figure) {
         type: 'POST',
         data: {object: JSON.stringify(object), layer_id: getLayerId()},
         dataType: 'json',
-        success: function(data) {
+        success: function (data) {
             console.log(data);
         }
     });
@@ -244,12 +221,12 @@ function delMarker(id) {
  * Context menu
  */
 
-function showContextMenu(currentLatLng, id, text) {
+function showContextMenu(currentLatLng, id, name) {
     setMenuXY(currentLatLng);
     $("#dropdown-menu").show();
     var $dropdown = $('#dropdown-menu-a');
-    $dropdown.text(text);
-    $dropdown.click(function() {
+    $dropdown.text("Delete " + name);
+    $dropdown.click(function () {
         delMarker(id);
         $("#dropdown-menu").hide();
     });
@@ -280,16 +257,20 @@ function setMenuXY(currentLatLng) {
 function setClickableAll(clickable) {
     if (arguments.length == 0)
         clickable = true;
-    Object.keys(figureList).forEach(function(temp) {
-        figureList[temp].setOptions({clickable : clickable});
+    Object.keys(figureList).forEach(function (temp) {
+        figureList[temp].setOptions({
+            clickable: clickable
+        });
     });
 }
 
 function setEditableAll(editable) {
     if (arguments.length == 0)
         editable = true;
-    Object.keys(figureList).forEach(function(temp) {
-        figureList[temp].setOptions({editable : editable});
-        figureList[temp].setDraggable(true);
+    Object.keys(figureList).forEach(function (temp) {
+        figureList[temp].setOptions({
+            editable: editable,
+            draggable: editable
+        });
     });
 }
