@@ -53,10 +53,10 @@ function initialize() {
 
     var options = {
         strokeColor: '#FF0000',
-        strokeOpacity: 0.8,
+        strokeOpacity: 0.7,
         strokeWeight: 2,
         fillColor: "#FF0000",
-        fillOpacity: 0.25,
+        fillOpacity: 0.20,
         clickable: false,
         draggable: false,
         zIndex: 1,
@@ -113,9 +113,12 @@ function listenMenu() {
 }
 
 function listenEsc() {
-    $(document).keydown(function(e) {
-        if (e.keyCode == 17)
+    $(document).keydown(function (e) {
+        if (e.keyCode == 17) {
             ctrlIsPressed = true;
+        } else if (e.keyCode == 46) {
+            delFigure();
+        }
     });
     $(document).keyup(function (e) {
         if (e.keyCode == 27) {
@@ -169,10 +172,13 @@ function listenFigureComplete() {
         tools.forEach(function (tool) {
             if (type == tool.class)
                 google.maps.event.addListener(figure, "rightclick", function (event) {
-                    if (selected.length > 1)
-                        showContextMenu(event.latLng, "this objects: " + selected.length);
-                    else
-                        showContextMenu(event.latLng, tool.name);
+                    if (selected.length > 1) {
+                        if (selected.indexOf(figure) >= 0) {
+                            showContextMenu(event.latLng, "this objects: " + selected.length);
+                        }
+                    } else {
+                        showContextMenu(event.latLng, tool.name, figure.__gm_id);
+                    }
                 });
         });
 
@@ -182,7 +188,9 @@ function listenFigureComplete() {
             }
             figure.setOptions({
                 editable: true,
-                draggable: true
+                draggable: true,
+                strokeOpacity: 1,
+                fillOpacity: 0.30
             });
             selected.push(figure);
         });
@@ -225,23 +233,27 @@ function saveObjectToDB(type, figure) {
     });
 }
 
-function delFigure() {
-    selected.forEach(function (figure) {
-        figure.setMap(null);
-    })
+function delFigure(id) {
+    if (arguments.length > 0) {
+        figureList[id].setMap(null);
+    } else {
+        selected.forEach(function (figure) {
+            figure.setMap(null);
+        })
+    }
 }
 
 /**
  * Context menu
  */
 
-function showContextMenu(currentLatLng, name) {
+function showContextMenu(currentLatLng, name, id) {
     setMenuXY(currentLatLng);
     $("#dropdown-menu").show();
     var $dropdown = $('#dropdown-menu-a');
     $dropdown.text("Delete " + name);
     $dropdown.click(function () {
-        delFigure();
+        delFigure(id);
         $("#dropdown-menu").hide();
     });
 }
@@ -282,7 +294,9 @@ function unSelect() {
     Object.keys(figureList).forEach(function (temp) {
         figureList[temp].setOptions({
             editable: false,
-            draggable: false
+            draggable: false,
+            strokeOpacity: 0.7,
+            fillOpacity: 0.20
         });
     });
     selected = [];
