@@ -47,9 +47,13 @@ function initialize() {
         fillColor: "#FF0000",
         fillOpacity: 0.25,
         clickable: false,
+        draggable: false,
         zIndex: 1,
-        editable: true
-    }
+        editable: false
+    };
+
+    var optionsPolyline = jQuery.extend({}, options);
+    optionsPolyline.strokeWeight = 3;
 
     drawingManager = new google.maps.drawing.DrawingManager({
         drawingControl: false,
@@ -58,7 +62,7 @@ function initialize() {
             zIndex: 2,
             flat: false
         },
-        polylineOptions: options,
+        polylineOptions: optionsPolyline,
         polygonOptions: options,
         rectangleOptions: options,
         circleOptions: options
@@ -115,6 +119,7 @@ function listenEsc() {
     });
     google.maps.event.addListener(map, 'click', function () {
         $("#dropdown-menu").hide();
+        setEditableAll(false);
     });
     google.maps.event.addListener(map, 'rightclick', function () {
         closeTool();
@@ -130,6 +135,8 @@ function listenToolBtn(tool) {
             drawingManager.setOptions({
                 drawingMode: tool.class
             });
+            setEditableAll(false);
+            setClickableAll(false);
             $btn.addClass("btn-primary");
         } else {
             closeTool();
@@ -143,6 +150,7 @@ function closeTool() {
     });
     $(".btn-tool").removeClass("btn-primary");
     $("#dropdown-menu").hide();
+    setClickableAll(true);
 }
 
 function listenComplete() {
@@ -183,6 +191,11 @@ function listenComplete() {
             });
         }
 
+        google.maps.event.addListener(marker, "click", function () {
+            setEditableAll(false);
+            marker.setEditable(true);
+        });
+
         id = marker.__gm_id;
         figureList[id] = marker;
 
@@ -219,7 +232,7 @@ function saveObjectToDB(type, marker) {
     });
 }
 
-var delMarker = function (id) {
+function delMarker(id) {
     var marker = figureList[id];
     marker.setMap(null);
 }
@@ -231,8 +244,9 @@ var delMarker = function (id) {
 function showContextMenu(currentLatLng, id, text) {
     setMenuXY(currentLatLng);
     $("#dropdown-menu").show();
-    $("#dropdown-menu-a").text(text);
-    $("#dropdown-menu-a").click(function() {
+    var $dropdown = $('#dropdown-menu-a');
+    $dropdown.text(text);
+    $dropdown.click(function() {
         delMarker(id);
         $("#dropdown-menu").hide();
     });
@@ -246,27 +260,32 @@ function getCanvasXY(currentLatLng) {
     );
     var worldCoordinateNW = map.getProjection().fromLatLngToPoint(nw);
     var worldCoordinate = map.getProjection().fromLatLngToPoint(currentLatLng);
-    var currentLatLngOffset = new google.maps.Point(
+    return new google.maps.Point(
         Math.floor((worldCoordinate.x - worldCoordinateNW.x) * scale),
         Math.floor((worldCoordinate.y - worldCoordinateNW.y) * scale)
     );
-    return currentLatLngOffset;
 }
 
 function setMenuXY(currentLatLng) {
-    var mapWidth = $('#map_canvas').width();
-    var mapHeight = $('#map_canvas').height();
-    var menuWidth = $('.contextmenu').width();
-    var menuHeight = $('.contextmenu').height();
     var clickedPosition = getCanvasXY(currentLatLng);
-    var x = clickedPosition.x;
-    var y = clickedPosition.y;
 
-    if ((mapWidth - x ) < menuWidth)//if to close to the map border, decrease x position
-        x = x - menuWidth;
-    if ((mapHeight - y ) < menuHeight)//if to close to the map border, decrease y position
-        y = y - menuHeight;
+    var $dropdown = $('#dropdown-menu');
+    $dropdown.css('left', x);
+    $dropdown.css('top', y);
+}
 
-    $('#dropdown-menu').css('left', x);
-    $('#dropdown-menu').css('top', y);
-};
+function setClickableAll(clickable) {
+    if (arguments.length == 0)
+        clickable = true;
+    Object.keys(figureList).forEach(function(temp) {
+        figureList[temp].setOptions({clickable : clickable});
+    });
+}
+
+function setEditableAll(editable) {
+    if (arguments.length == 0)
+        editable = true;
+    Object.keys(figureList).forEach(function(temp) {
+        figureList[temp].setEditable(editable);
+    });
+}
