@@ -24,7 +24,7 @@ class User
             if ($result->num_rows > 0) {
                 $this->login = true;
                 $this->id = $user['user_id'];
-                $this->mail = $user['email'];
+                $this->mail = $user['e-mail'];
                 $this->fullname = $user['fullname'];
             }
         }

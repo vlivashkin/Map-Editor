@@ -11,12 +11,11 @@
     $user = new User();
     if ($user->isLoggedIn() && isset($_POST['object']) && isset($_POST['layer_id'])) {
         $mysqli = new mysqli(SQLConfig::SERVERNAME, SQLConfig::USER, SQLConfig::PASSWORD, SQLConfig::DATABASE);
-        //        folder id should be written into session
-        $query = "INSERT INTO `layers` VALUES (null, '', '', 0, '".$user->getId()."', '".$_SESSION['folder_id']."')";
+        $query = "INSERT INTO `objects` VALUES (null, '".$_POST['object']."', '".$_POST['layer_id']."')";
         $result = $mysqli->query($query);
 
         if($result === TRUE) {
-            // That's OK. We can do everything
+           echo "OK";
         }
     }
 

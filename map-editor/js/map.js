@@ -29,7 +29,7 @@ var mapOptions = {
  * @returns {id}
  */
 function getLayerId() {
-    var id;
+    var id = 9;
     return id;
 }
 
@@ -155,80 +155,83 @@ function closeTool() {
 
 function listenComplete() {
     google.maps.event.addListener(drawingManager, 'overlaycomplete', function (event) {
-        var marker = event.overlay;
+        var figure = event.overlay;
         var type = event.type;
 
         if (type == google.maps.drawing.OverlayType.MARKER) {
-            google.maps.event.addListener(marker, "rightclick", function (event) {
-                showContextMenu(event.latLng, marker.__gm_id, "Delete marker");
+            google.maps.event.addListener(figure, "rightclick", function (event) {
+                showContextMenu(event.latLng, figure.__gm_id, "Delete figure");
             });
         } else if (type == google.maps.drawing.OverlayType.POLYLINE || type == google.maps.drawing.OverlayType.POLYGON) {
-            google.maps.event.addListener(marker, "insert_at", function (event) {
-                console.log(marker.__gm_id + " insert_at");
-                console.log(marker.getPath().getArray());
+            google.maps.event.addListener(figure, "insert_at", function (event) {
+                console.log(figure.__gm_id + " insert_at");
+                console.log(figure.getPath().getArray());
             });
-            google.maps.event.addListener(marker, "remove_at", function (event) {
-                console.log(marker.__gm_id + " remove_at");
-                console.log(marker.getPath().getArray());
+            google.maps.event.addListener(figure, "remove_at", function (event) {
+                console.log(figure.__gm_id + " remove_at");
+                console.log(figure.getPath().getArray());
             });
-            google.maps.event.addListener(marker, "set_at", function (event) {
-                console.log(marker.__gm_id + " set_at: ");
-                console.log(marker.getPath().getArray());
+            google.maps.event.addListener(figure, "set_at", function (event) {
+                console.log(figure.__gm_id + " set_at: ");
+                console.log(figure.getPath().getArray());
             });
         } else if (type == google.maps.drawing.OverlayType.RECTANGLE) {
-            google.maps.event.addListener(marker, "bounds_changed", function () {
-                console.log(marker.__gm_id + " bounds_changed:");
-                console.log(marker.getBounds());
+            google.maps.event.addListener(figure, "bounds_changed", function () {
+                console.log(figure.__gm_id + " bounds_changed:");
+                console.log(figure.getBounds());
             });
         } else if (type == google.maps.drawing.OverlayType.CIRCLE) {
-            google.maps.event.addListener(marker, "radius_changed", function () {
-                console.log(marker.__gm_id + " radius_changed:");
-                console.log(marker.getRadius());
+            google.maps.event.addListener(figure, "radius_changed", function () {
+                console.log(figure.__gm_id + " radius_changed:");
+                console.log(figure.getRadius());
             });
-            google.maps.event.addListener(marker, "center_changed", function () {
-                console.log(marker.__gm_id + " center_changed:");
-                console.log(marker.getCenter());
+            google.maps.event.addListener(figure, "center_changed", function () {
+                console.log(figure.__gm_id + " center_changed:");
+                console.log(figure.getCenter());
             });
         }
 
-        google.maps.event.addListener(marker, "click", function () {
+        google.maps.event.addListener(figure, "click", function () {
             setEditableAll(false);
-            marker.setEditable(true);
+            figure.setEditable(true);
         });
 
-        id = marker.__gm_id;
-        figureList[id] = marker;
+        id = figure.__gm_id;
+        figureList[id] = figure;
 
-        saveObjectToDB(type, marker);
+        saveObjectToDB(type, figure);
     });
 }
 /**
  * Save to DataBase functions
  */
 
-function saveObjectToDB(type, marker) {
+function saveObjectToDB(type, figure) {
     var object = {
-        id: marker.__gm_id,
+        id: figure.__gm_id,
         type: type
     };
     if (type == google.maps.drawing.OverlayType.MARKER) {
-        object.position = marker.getPosition();
+        object.position = figure.getPosition();
     } else if (type == google.maps.drawing.OverlayType.POLYLINE || type == google.maps.drawing.OverlayType.POLYGON) {
-        object.path = marker.getPath().getArray();
+        object.path = figure.getPath().getArray();
     } else if (type == google.maps.drawing.OverlayType.RECTANGLE) {
-        object.bounds = marker.getBounds();
+        object.bounds = figure.getBounds();
     } else if (type == google.maps.drawing.OverlayType.CIRCLE) {
-        object.center = marker.getCenter();
-        object.radius = marker.getRadius();
+        object.center = figure.getCenter();
+        object.radius = figure.getRadius();
     }
 
-    console.log(object);
+    console.log(JSON.stringify(object));
 
     $.ajax({
         url: 'classes/saveObjects.php',
         type: 'POST',
         data: {object: JSON.stringify(object), layer_id: getLayerId()},
-        dataType: 'json'
+        dataType: 'json',
+        success: function(data) {
+            console.log(data);
+        }
     });
 }
 
@@ -270,8 +273,8 @@ function setMenuXY(currentLatLng) {
     var clickedPosition = getCanvasXY(currentLatLng);
 
     var $dropdown = $('#dropdown-menu');
-    $dropdown.css('left', x);
-    $dropdown.css('top', y);
+    $dropdown.css('left', clickedPosition.x);
+    $dropdown.css('top', clickedPosition.y);
 }
 
 function setClickableAll(clickable) {
@@ -287,5 +290,6 @@ function setEditableAll(editable) {
         editable = true;
     Object.keys(figureList).forEach(function(temp) {
         figureList[temp].setOptions({editable : editable});
+        figureList[temp].setDraggable(true);
     });
 }
