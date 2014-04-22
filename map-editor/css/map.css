@@ -61,3 +61,15 @@ body {
     border-bottom: 1px solid #d1d1d1 !important;
     margin-right: -3px;
 }
+
+#sign-in-alert {
+    display: none;
+}
+
+.sign-in-checkbox-block {
+    position: absolute;
+}
+
+.sign-in-checkbox-block label {
+    font-weight: normal;
+}

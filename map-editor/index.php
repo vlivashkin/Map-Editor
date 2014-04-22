@@ -1,98 +1,119 @@
 <?php
-require_once("classes/User.php");
-$user = new User();
+    require_once('classes/User.php');
+    $user = new User();
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <link rel="StyleSheet" type="text/css" href="css/map.css"/>
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/main.css">
+
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=true&language=ru&libraries=places,panoramio,drawing"
+            type="text/javascript"></script>
+    <script src="js/map.js" type="text/javascript"></script>
+    <script src="js/jquery.js" type="text/javascript"></script>
     <script src="js/bootstrap.min.js" type="text/javascript"></script>
+    <title>Map</title>
 
-    <title>Map Editor</title>
 </head>
-<body>
-
-<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-    <div class="container">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="#">Map Planner</a>
+<body onload="initialize();">
+    <div id="toolbar">
+        <div style="margin: 10px 0 -10px 0">
+            <p>
+                <button id="marker" title="place a marker" type="button"
+                        class="btn btn-tool glyphicon glyphicon-map-marker"></button>
+            </p>
+            <p>
+                <button id="polyline" title="draw a polyline" type="button"
+                        class="btn btn-tool glyphicon glyphicon-flash"></button>
+            </p>
+            <p>
+                <button id="polygon" title="draw a polygon" type="button"
+                        class="btn btn-tool glyphicon glyphicon-stop"></button>
+            </p>
+            <p>
+                <button id="rectangle" title="draw a rectangle" type="button"
+                        class="btn btn-tool glyphicon glyphicon-retweet"></button>
+            </p>
+            <p>
+                <button id="circle" title="draw a circle" type="button"
+                        class="btn btn-tool glyphicon glyphicon-certificate"></button>
+            </p>
+            <p>
+                <button disabled="disabled" id="description" title="add a description" type="button"
+                        class="btn btn-tool glyphicon glyphicon-comment"></button>
+            </p>
+            <p>
+                <button disabled="disabled" id="photo" title="attach a photo" type="button"
+                        class="btn btn-tool glyphicon glyphicon-camera"></button>
         </div>
-        <?php
-        if (!$user->isLoggedIn()) {
-            ?>
-            <div class="navbar-collapse collapse">
-                <form class="navbar-form navbar-right" role="form" method="post" action="action.php">
-                    <div class="form-group">
-                        <input type="text" name="email" placeholder="Email" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <input type="password" name="password" placeholder="Password" class="form-control">
-                    </div>
-                    <button type="submit" name="signin" class="btn btn-success">Sign in</button>
-                </form>
-            </div>
-        <?php
-        } else {
-            ?>
+        <hr>
+        <div style="margin: -10px 0 0 0">
+            <p>
+                <button disabled="disabled" title="calculate the distance" type="button"
+                        class="btn btn-warning glyphicon glyphicon-resize-horizontal"></button>
+            </p>
+            <p>
+                <button disabled="disabled" title="get point coordinates" type="button"
+                        class="btn btn-warning glyphicon glyphicon-screenshot"></button>
+            </p>
+            <p>
+                <button disabled="disabled" title="attach a photo" type="button"
+                        class="btn btn-warning glyphicon glyphicon-camera"></button>
+            </p>
+        </div>
+    </div>
 
-
-        <?php
-        }
+    <div id="menubar">
+        <?php 
+            if(!$user->isLoggedIn())
+                echo '<button id="sign-in-button" type="button" class="btn btn-warning glyphicon glyphicon-user" data-toggle="modal" data-target="#sign-in-window"></button>';
         ?>
-    </div>
-</div>
-
-<div class="jumbotron">
-    <div class="container">
-        <h1>Welcome!</h1>
-
-        <p>Plan your doings with your own map! It is easy to try map editing. Just sign in and draw your
-            map objects. Show imagination and have fun!
-        </p>
-
-        <p><a href="map.php" class="btn btn-primary btn-lg" role="button">Try it! &raquo;</a></p>
-    </div>
-</div>
-
-<div class="container">
-    <div class="row">
-        <div class="col-md-4">
-            <h2>Simple editing</h2>
-
-            <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris
-                condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis
-                euismod. Donec sed odio dui. </p>
-
-            <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
-        </div>
-        <div class="col-md-4">
-            <h2>Traveling</h2>
-
-            <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris
-                condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis
-                euismod. Donec sed odio dui. </p>
-
-            <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
-        </div>
-        <div class="col-md-4">
-            <h2>Another one</h2>
-
-            <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris
-                condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis
-                euismod. Donec sed odio dui. </p>
-
-            <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+        <button id="toolBtn" type="button" class="btn btn-danger glyphicon glyphicon-pencil"></button>
+        <button id="panoramio" type="button" class="btn btn-primary glyphicon glyphicon-picture"></button>
+        <div class="btn-group">
+            <button id="zoom-out" type="button" class="btn btn-success glyphicon glyphicon-zoom-out"></button>
+            <button id="zoom-in" type="button" class="btn btn-success glyphicon glyphicon-zoom-in"></button>
         </div>
     </div>
+    <div id="map-canvas"></div>
 
-    <hr>
-
-    <footer>
-        <p>&copy; Company 2014</p>
-    </footer>
-</div>
+    <ul id="dropdown-menu" class="dropdown-menu" role="menu">
+        <li role="presentation"><a id="dropdown-menu-a" role="menuitem" tabindex="-1" href="#">Delete marker</a></li>
+    </ul>
+    <?php if(!$user->isLoggedIn()) { ?>
+        <div class="modal fade" id="sign-in-window" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">Welcome!</h4>
+              </div>
+              <div class="modal-body">
+                <div class="form-group">
+                  <input id="mail-field" type="text" class="form-control" placeholder="E-mail">
+                </div>
+                <div class="form-group">
+                  <input id="pass-field" type="password" class="form-control" placeholder="Password">
+                </div>
+                <div class="sign-in-checkbox-block" >
+                    <input type="checkbox" id="sign-in-checkbox" />
+                    <label for="sign-in-checkbox">Remember me</label>
+                </div>
+              </div>
+              <div class="alert alert-danger alert-dismissable" id="sign-in-alert">
+                  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                  <strong>Warning!</strong> Better check yourself, you're not looking too good.
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="sign-in">Sign in</button>
+              </div>
+            </div>
+          </div>
+        </div>
+    <?php } ?>
 </body>
-</html>
+</html>	

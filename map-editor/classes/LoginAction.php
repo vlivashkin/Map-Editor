@@ -10,8 +10,7 @@ class LoginAction
         require_once('SQLConfig.php');
     }
 
-    public function signIn()
-    {
+    public function signIn() {
         if ($this->post) {
             $name = $this->post['email'];
             if (!get_magic_quotes_gpc())

@@ -4,9 +4,9 @@ if ($_POST) {
     $signin = new LoginAction($_POST);
     if (isset($_POST['signin'])) {
         if ($signin->signIn())
-            header('Location: home.php');
+            echo "yes";
         else
-            header('Location: index.php');
+            echo "no";
     }
 } else
     header('Location: index.php');

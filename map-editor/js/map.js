@@ -41,6 +41,22 @@ function getLayerId() {
     return id;
 }
 
+/**
+ * Sign in function
+ */
+function signIn() {
+    $.ajax({
+        url: 'action.php',
+        type: 'POST',
+        data: {signin: true, email: $("#mail-field").val(), password: $("#pass-field").val()},
+        success: function(data) {
+            if(data.length == 4)
+                location.reload();
+        }
+    });
+}
+
+
 function initialize() {
     map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
     panoramio = new google.maps.panoramio.PanoramioLayer();
@@ -108,6 +124,9 @@ function listenMenu() {
     });
     $("#toolBtn").click(function () {
         $("#toolbar").toggle();
+    });
+    $("#sign-in").click(function () {
+        signIn();
     });
 }
 
