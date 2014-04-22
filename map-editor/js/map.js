@@ -16,6 +16,20 @@ var tools = [
     {name: "circle", class: google.maps.drawing.OverlayType.CIRCLE}
 ];
 
+var selectedFigure = {
+    editable: true,
+    draggable: true,
+    strokeOpacity: 1,
+    fillOpacity: 0.30
+};
+
+var unselectedFigure = {
+    editable: false,
+    draggable: false,
+    strokeOpacity: 0.7,
+    fillOpacity: 0.20
+};
+
 var mapOptions = {
     center: new google.maps.LatLng(-34.397, 150.644),
     zoom: 8,
@@ -51,7 +65,13 @@ function initialize() {
     menu = document.getElementById("menubar");
     map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(menu);
 
-    var options = {
+    var defaultMarker = {
+        draggable: true,
+        zIndex: 2,
+        flat: false
+    };
+
+    var defaultOptions = {
         strokeColor: '#FF0000',
         strokeOpacity: 0.7,
         strokeWeight: 2,
@@ -63,20 +83,16 @@ function initialize() {
         editable: false
     };
 
-    var optionsPolyline = jQuery.extend({}, options);
-    optionsPolyline.strokeWeight = 3;
+    var defaultPolyline = jQuery.extend({}, defaultOptions);
+    defaultPolyline.strokeWeight = 3;
 
     drawingManager = new google.maps.drawing.DrawingManager({
         drawingControl: false,
-        markerOptions: {
-            draggable: true,
-            zIndex: 2,
-            flat: false
-        },
-        polylineOptions: optionsPolyline,
-        polygonOptions: options,
-        rectangleOptions: options,
-        circleOptions: options
+        markerOptions: defaultMarker,
+        polylineOptions: defaultPolyline,
+        polygonOptions: defaultOptions,
+        rectangleOptions: defaultOptions,
+        circleOptions: defaultOptions
     });
     drawingManager.setMap(map);
 
@@ -128,12 +144,12 @@ function listenEsc() {
     });
     google.maps.event.addListener(map, 'click', function () {
         $("#dropdown-menu").hide();
-        unSelect();
+        unselectAll();
     });
     google.maps.event.addListener(map, 'rightclick', function () {
         closeTool();
         $("#dropdown-menu").hide();
-        unSelect();
+        unselectAll();
     });
 }
 
@@ -146,7 +162,7 @@ function listenToolBtn(tool) {
             drawingManager.setOptions({
                 drawingMode: tool.class
             });
-            unSelect();
+            unselectAll();
             setClickableAll(false);
             $btn.addClass("btn-primary");
         } else {
@@ -167,39 +183,84 @@ function closeTool() {
 function listenFigureComplete() {
     google.maps.event.addListener(drawingManager, 'overlaycomplete', function (event) {
         var figure = event.overlay;
-        var type = event.type;
+        var toolName = event.type;
 
         tools.forEach(function (tool) {
-            if (type == tool.class)
-                google.maps.event.addListener(figure, "rightclick", function (event) {
-                    if (selected.length > 1) {
-                        if (selected.indexOf(figure) >= 0) {
-                            showContextMenu(event.latLng, "this objects: " + selected.length);
-                        }
-                    } else {
-                        showContextMenu(event.latLng, tool.name, figure.__gm_id);
-                    }
-                });
+            if (event.type == tool.class) {
+                toolName = tool.class;
+            }
+        });
+
+        google.maps.event.addListener(figure, "rightclick", function (event) {
+            if (selected.length > 1) {
+                if (selected.indexOf(figure) >= 0) {
+                    showContextMenu(event.latLng, "this objects: " + selected.length);
+                }
+            } else {
+                showContextMenu(event.latLng, toolName, figure.__gm_id);
+            }
+        });
+
+        google.maps.event.addListener(figure, "drag", function (event) {
+            console.log("position_changed");
         });
 
         google.maps.event.addListener(figure, "click", function () {
             if (!ctrlIsPressed) {
-                unSelect();
+                unselectAll();
             }
-            figure.setOptions({
-                editable: true,
-                draggable: true,
-                strokeOpacity: 1,
-                fillOpacity: 0.30
-            });
-            selected.push(figure);
+            if (selected.indexOf(figure) >= 0) {
+                unselectFigure(figure);
+            } else {
+                selectFigure(figure);
+            }
+
         });
 
         figureList[figure.__gm_id] = figure;
 
-        saveObjectToDB(type, figure);
+        saveObjectToDB(toolName, figure);
     });
 }
+
+function delFigure(id) {
+    if (arguments.length == 1 && id != undefined) {
+        console.log(id);
+        figureList[id].setMap(null);
+    } else {
+        selected.forEach(function (figure) {
+            figure.setMap(null);
+        })
+    }
+}
+
+function setClickableAll(clickable) {
+    if (arguments.length == 0)
+        clickable = true;
+    Object.keys(figureList).forEach(function (temp) {
+        figureList[temp].setOptions({
+            clickable: clickable
+        });
+    });
+}
+
+function selectFigure(figure) {
+    figure.setOptions(selectedFigure);
+    selected.push(figure);
+}
+
+function unselectFigure(figure) {
+    figure.setOptions(unselectedFigure);
+    selected.splice(selected.indexOf(figure), 1);
+}
+
+function unselectAll() {
+    Object.keys(figureList).forEach(function (temp) {
+        figureList[temp].setOptions(unselectedFigure);
+    });
+    selected = [];
+}
+
 /**
  * Save to DataBase functions
  */
@@ -231,16 +292,6 @@ function saveObjectToDB(type, figure) {
             console.log(data);
         }
     });
-}
-
-function delFigure(id) {
-    if (arguments.length > 0) {
-        figureList[id].setMap(null);
-    } else {
-        selected.forEach(function (figure) {
-            figure.setMap(null);
-        })
-    }
 }
 
 /**
@@ -278,26 +329,4 @@ function setMenuXY(currentLatLng) {
     var $dropdown = $('#dropdown-menu');
     $dropdown.css('left', clickedPosition.x);
     $dropdown.css('top', clickedPosition.y);
-}
-
-function setClickableAll(clickable) {
-    if (arguments.length == 0)
-        clickable = true;
-    Object.keys(figureList).forEach(function (temp) {
-        figureList[temp].setOptions({
-            clickable: clickable
-        });
-    });
-}
-
-function unSelect() {
-    Object.keys(figureList).forEach(function (temp) {
-        figureList[temp].setOptions({
-            editable: false,
-            draggable: false,
-            strokeOpacity: 0.7,
-            fillOpacity: 0.20
-        });
-    });
-    selected = [];
 }
