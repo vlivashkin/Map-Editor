@@ -16,14 +16,14 @@ body {
 
 #menubar {
     margin-bottom: -42px;
-    margin-right: 45px;
-    padding: 0 5px 2px 5px;
+    margin-right: 44px;
+    padding: 0 3px 3px 3px;
     background-color: rgba(225, 225, 225, .5);
     display: none;
 }
 
-#menubar button {
-    margin: 3px 0;
+#menubar .btn-group {
+    margin: 3px 3px;
 }
 
 #toolbar {
@@ -37,12 +37,13 @@ body {
     margin: 0;
 }
 
-#toolbar button {
-    margin: 3px 5px 3px 5px;
+#toolbar button,
+#signinbar button{
+    margin: 3px 5px;
 }
 
 #toolbar hr {
-    margin: 5px 0 5px 0;
+    margin: 5px 0;
     width: 45px;
     height: 1px;
     border: none;
@@ -59,4 +60,21 @@ body {
 
 .sign-in-checkbox-block label {
     font-weight: normal;
+}
+
+#signinbar {
+    margin-top: 10px;
+    padding-bottom: 2px;
+    background-color: rgba(225, 225, 225, .5);
+    display: none;
+}
+
+.gmnoprint.gm-style-mtc {
+    background-color: rgba(225, 225, 225, .5);
+    margin: 10px 10px 0 0!important;
+    padding: 8px 4px 7px 4px;
+}
+
+#menubar button {
+    margin: 0;
 }

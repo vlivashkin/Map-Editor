@@ -77,6 +77,8 @@ function initialize() {
     map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
     panoramio = new google.maps.panoramio.PanoramioLayer();
 
+    menu = document.getElementById("signinbar");
+    map.controls[google.maps.ControlPosition.TOP_RIGHT].push(menu);
     menu = document.getElementById("menubar");
     map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(menu);
     toolbar = document.getElementById("toolbar");
@@ -120,8 +122,11 @@ function initialize() {
 
     createListeners();
 
-    $("#menubar").show();
-    $("#toolbar").show();
+    setTimeout(function() {
+        $("#signinbar").show();
+        $("#menubar").show();
+        $("#toolbar").show();
+    }, 300);
 }
 
 /**
