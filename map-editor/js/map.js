@@ -112,6 +112,11 @@ function initialize() {
     });
     drawingManager.setMap(map);
 
+    var ctaLayer = new google.maps.KmlLayer({
+        url: 'http://gmaps-samples.googlecode.com/svn/trunk/ggeoxml/cta.kml'
+    });
+    ctaLayer.setMap(map);
+
     createListeners();
 }
 

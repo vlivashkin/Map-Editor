@@ -48,6 +48,11 @@
             <p>
                 <button disabled="disabled" id="photo" title="attach a photo" type="button"
                         class="btn btn-tool glyphicon glyphicon-camera"></button>
+            </p>
+            <p>
+                <button disabled="disabled" id="kml" title="load gps track" type="button"
+                        class="btn btn-tool glyphicon glyphicon-phone"></button>
+            </p>
         </div>
         <hr>
         <div style="margin: -10px 0 0 0">
