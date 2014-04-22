@@ -21,11 +21,9 @@
 <body onload="initialize();">
     <div id="toolbar">
         <div>
-            <p>
-                <button disabled="disabled" id="logo" title="logo" type="button" class="btn btn-tool">
-                    <span style="color: red" class="glyphicon glyphicon-map-marker"></span>
-                </button>
-            </p>
+            <h3 style="text-align: center; margin: 10px 0">
+                <span class="glyphicon glyphicon-road"></span>
+            </h3>
             <p>
                 <button id="marker" title="place a marker" type="button"
                         class="btn btn-tool glyphicon glyphicon-map-marker"></button>
@@ -62,15 +60,15 @@
         <hr>
         <div>
             <p>
-                <button disabled="disabled" title="calculate the distance" type="button"
+                <button title="calculate the distance" type="button"
                         class="btn btn-warning glyphicon glyphicon-resize-horizontal"></button>
             </p>
             <p>
-                <button disabled="disabled" title="get point coordinates" type="button"
+                <button title="get point coordinates" type="button"
                         class="btn btn-warning glyphicon glyphicon-screenshot"></button>
             </p>
             <p>
-                <button disabled="disabled" title="attach a photo" type="button"
+                <button title="attach a photo" type="button"
                         class="btn btn-warning glyphicon glyphicon-camera"></button>
             </p>
         </div>

@@ -34,18 +34,17 @@ var mapOptions = {
     center: new google.maps.LatLng(-34.397, 150.644),
     zoom: 8,
 
-    streetViewControl: true,
     mapTypeControl: true,
-    disableDefaultUI: true,
-    overviewMapControl: true,
-
     mapTypeControlOptions: {
         style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
         position: google.maps.ControlPosition.TOP_RIGHT
     },
+    streetViewControl: true,
     streetViewControlOptions: {
         position: google.maps.ControlPosition.RIGHT_BOTTOM
-    }
+    },
+    disableDefaultUI: true,
+    overviewMapControl: true
 };
 
 /**
