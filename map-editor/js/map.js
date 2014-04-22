@@ -1,7 +1,7 @@
 var map;
 var panoramio;
 var drawingManager;
-var menu;
+var menu, toolbar;
 
 var figureList = {};
 var selected = {};
@@ -80,6 +80,8 @@ function initialize() {
 
     menu = document.getElementById("menubar");
     map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(menu);
+    toolbar = document.getElementById("toolbar");
+    map.controls[google.maps.ControlPosition.TOP_LEFT].push(toolbar);
 
     var defaultMarker = {
         draggable: true,
@@ -118,6 +120,9 @@ function initialize() {
     ctaLayer.setMap(map);
 
     createListeners();
+
+    $("#menubar").show();
+    $("#toolbar").show();
 }
 
 /**

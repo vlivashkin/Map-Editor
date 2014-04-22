@@ -15,35 +15,22 @@ body {
 }
 
 #menubar {
-    text-align: right;
-    position: absolute;
-    right: 0;
-    bottom: 0;
     margin-bottom: -42px;
     margin-right: 45px;
-    z-index: 5;
-    width: 303px;
-    height: 35px;
-    min-height: 35px;
-    overflow-y: hidden;
-    overflow-x: hidden;
-    font-size: 14px;
-    font-family: Arial;
+    padding: 0 5px;
+    background-color: rgba(225, 225, 225, .5);
+    display: none;
+}
+
+#menubar button {
+    margin: 4px 0;
 }
 
 #toolbar {
-    position: absolute;
-    margin: 0;
-    height: 100%;
-    padding-right: 10px;
-    left: 0;
-    background-color: #eee;
-    border-right: 1px solid #bbb;
-    -webkit-box-shadow: 3px 0px 10px 0px rgba(50, 50, 50, 0.15);
-    -moz-box-shadow: 3px 0px 10px 0px rgba(50, 50, 50, 0.15);
-    box-shadow: 3px 0px 10px 0px rgba(50, 50, 50, 0.15);
-    z-index: 10;
-    /*display: none;*/
+    margin: 10px;
+    padding: 2px 0;
+    background-color: rgba(225, 225, 225, .5);
+    display: none;
 }
 
 #toolbar p {
@@ -51,15 +38,15 @@ body {
 }
 
 #toolbar button {
-    margin: 3px 0 3px 10px;
+    margin: 3px 5px 3px 5px;
 }
 
 #toolbar hr {
+    margin: 5px 0 5px 0;
     width: 45px;
     height: 1px;
     border: none;
     border-bottom: 1px solid #d1d1d1 !important;
-    margin-right: -3px;
 }
 
 #sign-in-alert {
