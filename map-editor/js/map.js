@@ -47,14 +47,54 @@ var mapOptions = {
     overviewMapControl: true
 };
 
+
+/**
+ * Function to operate with browser address string
+ */
+
+var QueryString = function () {
+    var query_string = {};
+    var query = window.location.search.substring(1);
+    var vars = query.split("&");
+    for (var i=0;i<vars.length;i++) {
+        var pair = vars[i].split("=");
+
+        if (typeof query_string[pair[0]] === "undefined") {
+            query_string[pair[0]] = pair[1];
+        } else if (typeof query_string[pair[0]] === "string") {
+            var arr = [ query_string[pair[0]], pair[1] ];
+            query_string[pair[0]] = arr;
+        } else {
+            query_string[pair[0]].push(pair[1]);
+        }
+    } 
+    return query_string;
+} ();
+
 /**
  * Function to get user layer id from the url string
  * like map.php?lid={id}
  * @returns {id}
  */
 function getLayerId() {
-    var id = 9;
-    return id;
+    return QueryString.lid;
+}
+
+/**
+ * Get user objects from database
+ */
+
+function displayObjectsFromDB() {
+    if(getLayerId())
+        $.ajax({
+            url: 'classes/getLayerObjects.php',
+            method: 'GET',
+            dataType: 'json',
+            data: {layer: getLayerId()},
+            success: function(json) {
+                console.log(json);
+            }
+        });
 }
 
 /**
@@ -121,6 +161,7 @@ function initialize() {
     ctaLayer.setMap(map);
 
     createListeners();
+    displayObjectsFromDB();
 
     setTimeout(function() {
         $("#signinbar").show();

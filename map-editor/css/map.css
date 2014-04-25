@@ -15,10 +15,10 @@ body {
 }
 
 #menubar {
-    margin-bottom: -42px;
+    margin-bottom: -44px;
     margin-right: 44px;
-    padding: 0 3px 3px 3px;
-    background-color: rgba(225, 225, 225, .5);
+    padding: 3px 3px 4px 4px;
+    background-color: rgba(225, 225, 225, .65);
     display: none;
 }
 
@@ -29,7 +29,7 @@ body {
 #toolbar {
     margin: 10px;
     padding: 2px 0;
-    background-color: rgba(225, 225, 225, .5);
+    background-color: rgba(225, 225, 225, .65);
     display: none;
 }
 
