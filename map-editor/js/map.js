@@ -1,12 +1,13 @@
 var map;
 var panoramio;
 var drawingManager;
-var menu, toolbar;
 
 var figureList = {};
 var selected = [];
 
-var ctrlIsPressed = false;
+var isCtrl = false;
+var infowindowMode = false;
+var infowindowcurrent;
 
 var tools = [
     {name: "marker", class: google.maps.drawing.OverlayType.MARKER},
@@ -46,6 +47,13 @@ var mapOptions = {
     disableDefaultUI: true,
     overviewMapControl: true
 };
+
+var contentString =
+    '<div>' +
+    '<textarea id="carea" class="form-control" placeholder="Write here"></textarea>' +
+    '<button type="button" class="btn btn-default">Cancel</button>' +
+    '<button type="button" class="btn btn-primary" onclick="saveInfoWindow();">Save</button>' +
+    '</div>';
 
 /**
  * Function to get user layer id from the url string
@@ -100,11 +108,11 @@ function initialize() {
     map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
     panoramio = new google.maps.panoramio.PanoramioLayer();
 
-    menu = document.getElementById("signinbar");
+    var menu = document.getElementById("signinbar");
     map.controls[google.maps.ControlPosition.TOP_RIGHT].push(menu);
     menu = document.getElementById("menubar");
     map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(menu);
-    toolbar = document.getElementById("toolbar");
+    var toolbar = document.getElementById("toolbar");
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(toolbar);
 
     var ctaLayer = new google.maps.KmlLayer({
@@ -159,10 +167,24 @@ function initialize() {
  */
 
 function createListeners() {
+    listenMap();
     listenMenu();
-    listenEsc();
+    listenKeyboard();
     tools.forEach(listenToolBtn);
     listenFigureOnComplete();
+    listenInfoTool();
+}
+
+function listenMap() {
+    google.maps.event.addListener(map, 'click', function () {
+        $("#dropdown-menu").hide();
+        unselectAll();
+    });
+    google.maps.event.addListener(map, 'rightclick', function () {
+        closeTool();
+        $("#dropdown-menu").hide();
+        unselectAll();
+    });
 }
 
 function listenMenu() {
@@ -183,35 +205,21 @@ function listenMenu() {
     });
 }
 
-function listenEsc() {
-    $(document).keydown(function (e) {
-        switch (e.keyCode) {
-            case 17 :
-                ctrlIsPressed = true;
-                break;
-            case 46 :
-                delFigure();
-                break;
-        }
-    });
+function listenKeyboard() {
     $(document).keyup(function (e) {
-        switch (e.keyCode) {
-            case 17 :
-                ctrlIsPressed = false;
-                break;
-            case 27 :
-                closeTool();
-                break;
+        if(e.keyCode == 17)
+            isCtrl = false;
+    }).keydown(function (e) {
+        if(e.keyCode == 17)
+            isCtrl = true;
+        if(e.keyCode == 27)
+            closeTool();
+        if(e.keyCode == 46)
+            delFigure();
+        if((e.keyCode == 65 || e.keyCode == 97)&& isCtrl == true) {
+            selectAll();
+            e.preventDefault();
         }
-    });
-    google.maps.event.addListener(map, 'click', function () {
-        $("#dropdown-menu").hide();
-        unselectAll();
-    });
-    google.maps.event.addListener(map, 'rightclick', function () {
-        closeTool();
-        $("#dropdown-menu").hide();
-        unselectAll();
     });
 }
 
@@ -233,12 +241,27 @@ function listenToolBtn(tool) {
     });
 }
 
-function closeTool() {
-    drawingManager.setOptions({
-        drawingMode: null
+function listenInfoTool() {
+    var $btn = $("#infowindow");
+
+    $btn.click(function () {
+        if (!$btn.hasClass("btn-primary")) {
+            closeTool();
+            map.setOptions({draggableCursor: 'crosshair'});
+            infowindowMode = true;
+            $btn.addClass("btn-primary");
+        } else {
+            closeTool();
+        }
     });
+}
+
+function closeTool() {
+    map.setOptions({draggableCursor: null});
+    drawingManager.setOptions({drawingMode: null});
     $(".btn-tool").removeClass("btn-primary");
     $("#dropdown-menu").hide();
+    infowindowMode = false;
     setClickableAll(true);
 }
 
@@ -253,6 +276,19 @@ function listenFigureOnComplete() {
             if (event.type == tool.class) {
                 toolName = tool.class;
             }
+        });
+
+        google.maps.event.addListener(figure, "click", function () {
+            if (figure.type == google.maps.drawing.OverlayType.MARKER && infowindowMode) {
+                figure.infowindow = new google.maps.InfoWindow({content: contentString});
+            }
+            if (figure.infowindow) {
+                figure.infowindow.open(map, figure);
+                infowindowcurrent = figure.infowindow;
+            }
+            if (!isCtrl)
+                unselectAll();
+            selected.indexOf(figure) >= 0 ? unselectFigure(figure) : selectFigure(figure);
         });
 
         google.maps.event.addListener(figure, "rightclick", function (event) {
@@ -311,12 +347,6 @@ function listenFigureOnComplete() {
             console.log("dragend");
         });
 
-        google.maps.event.addListener(figure, "click", function () {
-            if (!ctrlIsPressed)
-                unselectAll();
-            selected.indexOf(figure) >= 0 ? unselectFigure(figure) : selectFigure(figure);
-        });
-
         figureList[figure.__gm_id] = figure;
         saveObjectToDB(figure);
     });
@@ -351,6 +381,13 @@ function selectFigure(figure) {
 function unselectFigure(figure) {
     figure.setOptions(unselectedFigure);
     selected.splice(selected.indexOf(figure), 1);
+}
+
+function selectAll() {
+    Object.keys(figureList).forEach(function (temp) {
+        figureList[temp].setOptions(selectedFigure);
+        selected.push(temp);
+    });
 }
 
 function unselectAll() {
@@ -434,4 +471,15 @@ function setMenuXY(currentLatLng) {
     var $dropdown = $('#dropdown-menu');
     $dropdown.css('left', clickedPosition.x);
     $dropdown.css('top', clickedPosition.y);
+}
+
+function saveInfoWindow() {
+    var text = '<div id="ccontainer">' + $("#carea").val() + "<br><a onclick='editInfoWindow()'>Edit...</a></div>";
+    infowindowcurrent.setContent(text);
+}
+
+function editInfoWindow() {
+    var text = infowindowcurrent.getContent();
+    $("#ccontainer").html(contentString);
+    $("#carea").val(text);
 }
