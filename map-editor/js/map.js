@@ -93,7 +93,7 @@ function displayObjectsFromDB() {
  */
 function signIn() {
     $.ajax({
-        url: 'action.php',
+        url: 'classes/signAction.php',
         type: 'POST',
         data: {signin: true, email: $("#mail-field").val(), password: $("#pass-field").val()},
         success: function(data) {
@@ -101,6 +101,36 @@ function signIn() {
                 location.reload();
         }
     });
+}
+
+/**
+ * [loadTrack function. Allowed to load kml/kmz track onto server]
+ * @return {[type]} [description]
+ */
+function loadFile(type, file) {
+    $.ajax({
+        url: 'classes/loadFile.php',
+        type: 'POST',
+        data: {type: type, file: file},
+        success: function(data) {
+            console.log(data);
+        },
+        xhr: function() {  // Custom XMLHttpRequest
+            var myXhr = $.ajaxSettings.xhr();
+            if(myXhr.upload){ // Check if upload property exists
+                myXhr.upload.addEventListener('progress', displayLoadingProgress, false); // For handling the progress of the upload
+            }
+            return myXhr;
+        }
+    });
+}
+
+function displayLoadingProgress() {
+    if(e.lengthComputable){
+        // $('progress').attr({value:e.loaded,max:e.total});
+        console.log(e.loaded);
+        console.log(e.total);
+    }
 }
 
 
@@ -202,6 +232,12 @@ function listenMenu() {
     });
     $("#sign-in").click(function () {
         signIn();
+    });
+    $("#load-track").click(function () {
+        loadFile('track', $("#gps-input"));
+    });
+    $("#load-image").click(function () {
+        loadFile('img', $("#img-input"));
     });
 }
 

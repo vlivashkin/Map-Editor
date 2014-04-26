@@ -149,7 +149,7 @@ $user = new User();
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="sign-in">Add track</button>
+                <button type="button" class="btn btn-primary" id="load-track">Add track</button>
             </div>
         </div>
     </div>
@@ -167,7 +167,7 @@ $user = new User();
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="sign-in">Add image</button>
+                <button type="button" class="btn btn-primary" id="load-image">Add image</button>
             </div>
         </div>
     </div>

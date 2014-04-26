@@ -1,5 +1,5 @@
 <?php
-require_once("classes/LoginAction.php");
+require_once("LoginAction.php");
 if ($_POST) {
     $signin = new LoginAction($_POST);
     if (isset($_POST['signin'])) {
