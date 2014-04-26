@@ -15,10 +15,10 @@ body {
 }
 
 #menubar {
-    margin-bottom: -44px;
+    margin-bottom: -42px;
     margin-right: 44px;
-    padding: 3px 3px 4px 4px;
-    background-color: rgba(225, 225, 225, .65);
+    padding: 0 2px 2px 2px;
+    background-color: rgba(235, 235, 235, .65);
     display: none;
 }
 
@@ -29,7 +29,7 @@ body {
 #toolbar {
     margin: 10px;
     padding: 2px 0;
-    background-color: rgba(225, 225, 225, .65);
+    background-color: rgba(235, 235, 235, .65);
     display: none;
 }
 
@@ -37,7 +37,11 @@ body {
     margin: 0;
 }
 
-#toolbar button,
+#toolbar button {
+    border: 1px solid white;
+    margin: 3px 5px;
+}
+
 #signinbar button{
     margin: 3px 5px;
 }
@@ -65,14 +69,14 @@ body {
 #signinbar {
     margin-top: 10px;
     padding-bottom: 2px;
-    background-color: rgba(225, 225, 225, .5);
+    background-color: rgba(235, 235, 235, .65);
     display: none;
 }
 
 .gmnoprint.gm-style-mtc {
-    background-color: rgba(225, 225, 225, .5);
+    background-color: rgba(235, 235, 235, .65);
     margin: 10px 10px 0 0!important;
-    padding: 8px 4px 7px 4px;
+    padding: 9px 4px 8px 4px;
 }
 
 #menubar button {

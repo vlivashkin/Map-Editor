@@ -4,7 +4,7 @@ var drawingManager;
 var menu, toolbar;
 
 var figureList = {};
-var selected = {};
+var selected = [];
 
 var ctrlIsPressed = false;
 
@@ -47,37 +47,20 @@ var mapOptions = {
     overviewMapControl: true
 };
 
-
-/**
- * Function to operate with browser address string
- */
-
-var QueryString = function () {
-    var query_string = {};
-    var query = window.location.search.substring(1);
-    var vars = query.split("&");
-    for (var i=0;i<vars.length;i++) {
-        var pair = vars[i].split("=");
-
-        if (typeof query_string[pair[0]] === "undefined") {
-            query_string[pair[0]] = pair[1];
-        } else if (typeof query_string[pair[0]] === "string") {
-            var arr = [ query_string[pair[0]], pair[1] ];
-            query_string[pair[0]] = arr;
-        } else {
-            query_string[pair[0]].push(pair[1]);
-        }
-    } 
-    return query_string;
-} ();
-
 /**
  * Function to get user layer id from the url string
  * like map.php?lid={id}
  * @returns {id}
  */
 function getLayerId() {
-    return QueryString.lid;
+    return getParameterByName('lid');
+}
+
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+    return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
 /**
@@ -124,7 +107,12 @@ function initialize() {
     toolbar = document.getElementById("toolbar");
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(toolbar);
 
-    var defaultMarker = {
+    var ctaLayer = new google.maps.KmlLayer({
+        url: 'http://gmaps-samples.googlecode.com/svn/trunk/ggeoxml/cta.kml'
+    });
+    ctaLayer.setMap(map);
+
+    var defaultMarkerOptions = {
         draggable: true,
         zIndex: 2,
         flat: false
@@ -142,32 +130,28 @@ function initialize() {
         editable: false
     };
 
-    var defaultPolyline = jQuery.extend({}, defaultOptions);
-    defaultPolyline.strokeWeight = 3;
+    var defaultPolylineOptions = jQuery.extend({}, defaultOptions);
+    defaultPolylineOptions.strokeWeight = 3;
 
     drawingManager = new google.maps.drawing.DrawingManager({
         drawingControl: false,
-        markerOptions: defaultMarker,
-        polylineOptions: defaultPolyline,
+        markerOptions: defaultMarkerOptions,
+        polylineOptions: defaultPolylineOptions,
         polygonOptions: defaultOptions,
         rectangleOptions: defaultOptions,
         circleOptions: defaultOptions
     });
     drawingManager.setMap(map);
 
-    var ctaLayer = new google.maps.KmlLayer({
-        url: 'http://gmaps-samples.googlecode.com/svn/trunk/ggeoxml/cta.kml'
-    });
-    ctaLayer.setMap(map);
-
     createListeners();
-    displayObjectsFromDB();
 
     setTimeout(function() {
         $("#signinbar").show();
         $("#menubar").show();
         $("#toolbar").show();
     }, 300);
+
+    displayObjectsFromDB();
 }
 
 /**
@@ -178,7 +162,7 @@ function createListeners() {
     listenMenu();
     listenEsc();
     tools.forEach(listenToolBtn);
-    listenFigureComplete();
+    listenFigureOnComplete();
 }
 
 function listenMenu() {
@@ -189,10 +173,7 @@ function listenMenu() {
         map.setZoom(map.getZoom() - 1);
     });
     $("#panoramio").click(function () {
-        if (panoramio.getMap() != null)
-            panoramio.setMap(null);
-        else
-            panoramio.setMap(map);
+        panoramio.setMap(panoramio.getMap() == null ? map : null);
     });
     $("#toolBtn").click(function () {
         $("#toolbar").toggle();
@@ -204,17 +185,24 @@ function listenMenu() {
 
 function listenEsc() {
     $(document).keydown(function (e) {
-        if (e.keyCode == 17) {
-            ctrlIsPressed = true;
-        } else if (e.keyCode == 46) {
-            delFigure();
+        switch (e.keyCode) {
+            case 17 :
+                ctrlIsPressed = true;
+                break;
+            case 46 :
+                delFigure();
+                break;
         }
     });
     $(document).keyup(function (e) {
-        if (e.keyCode == 27) {
-            closeTool();
-        } else if (e.keyCode == 17)
-            ctrlIsPressed = false;
+        switch (e.keyCode) {
+            case 17 :
+                ctrlIsPressed = false;
+                break;
+            case 27 :
+                closeTool();
+                break;
+        }
     });
     google.maps.event.addListener(map, 'click', function () {
         $("#dropdown-menu").hide();
@@ -254,10 +242,12 @@ function closeTool() {
     setClickableAll(true);
 }
 
-function listenFigureComplete() {
+function listenFigureOnComplete() {
     google.maps.event.addListener(drawingManager, 'overlaycomplete', function (event) {
         var figure = event.overlay;
+        figure.type = event.type;
         var toolName = event.type;
+        var dragold;
 
         tools.forEach(function (tool) {
             if (event.type == tool.class) {
@@ -275,25 +265,60 @@ function listenFigureComplete() {
             }
         });
 
+        google.maps.event.addListener(figure, "dragstart", function (event) {
+            dragold = event.latLng;
+            console.log("dragstart");
+        });
+
         google.maps.event.addListener(figure, "drag", function (event) {
-            console.log("position_changed");
+            if (selected.length > 1) {
+                if (dragold) {
+                    var dragnew = event.latLng;
+                    var dlat = dragnew.lat() - dragold.lat();
+                    var dlng = dragnew.lng() - dragold.lng();
+
+                    selected.forEach(function(sel) {
+                        if (figure.__gm_id != sel.__gm_id) {
+                            switch (sel.type) {
+                                case google.maps.drawing.OverlayType.MARKER :
+                                    sel.setPosition(new google.maps.LatLng(sel.getPosition().lat() + dlat, sel.getPosition().lng() + dlng));
+                                    break;
+                                case google.maps.drawing.OverlayType.POLYLINE :
+                                case google.maps.drawing.OverlayType.POLYGON :
+                                    var path = sel.getPath();
+                                    path.forEach(function(point, index) {
+                                        path.setAt(index, new google.maps.LatLng(point.lat() + dlat, point.lng() + dlng));
+                                    });
+                                    break;
+                                case google.maps.drawing.OverlayType.RECTANGLE :
+                                    var bounds = sel.getBounds();
+                                    var sw = new google.maps.LatLng(bounds.getSouthWest().lat() + dlat, bounds.getSouthWest().lng() + dlng);
+                                    var ne = new google.maps.LatLng(bounds.getNorthEast().lat() + dlat, bounds.getNorthEast().lng() + dlng);
+                                    sel.setBounds(new google.maps.LatLngBounds(sw, ne));
+                                    break;
+                                case google.maps.drawing.OverlayType.CIRCLE :
+                                    sel.setCenter(new google.maps.LatLng(sel.getCenter().lat() + dlat, sel.getCenter().lng() + dlng));
+                                    break;
+                            }
+                        }
+                    });
+                    dragold = dragnew;
+                }
+            }
+        });
+
+        google.maps.event.addListener(figure, "dragend", function (event) {
+            console.log("dragend");
         });
 
         google.maps.event.addListener(figure, "click", function () {
-            if (!ctrlIsPressed) {
+            if (!ctrlIsPressed)
                 unselectAll();
-            }
-            if (selected.indexOf(figure) >= 0) {
-                unselectFigure(figure);
-            } else {
-                selectFigure(figure);
-            }
-
+            selected.indexOf(figure) >= 0 ? unselectFigure(figure) : selectFigure(figure);
         });
 
         figureList[figure.__gm_id] = figure;
-
-        saveObjectToDB(toolName, figure);
+        saveObjectToDB(figure);
     });
 }
 
@@ -304,7 +329,7 @@ function delFigure(id) {
     } else {
         selected.forEach(function (figure) {
             figure.setMap(null);
-        })
+        });
     }
 }
 
@@ -339,20 +364,26 @@ function unselectAll() {
  * Save to DataBase functions
  */
 
-function saveObjectToDB(type, figure) {
+function saveObjectToDB(figure) {
     var object = {
         id: figure.__gm_id,
-        type: type
+        type: figure.type
     };
-    if (type == google.maps.drawing.OverlayType.MARKER) {
-        object.position = figure.getPosition();
-    } else if (type == google.maps.drawing.OverlayType.POLYLINE || type == google.maps.drawing.OverlayType.POLYGON) {
-        object.path = figure.getPath().getArray();
-    } else if (type == google.maps.drawing.OverlayType.RECTANGLE) {
-        object.bounds = figure.getBounds();
-    } else if (type == google.maps.drawing.OverlayType.CIRCLE) {
-        object.center = figure.getCenter();
-        object.radius = figure.getRadius();
+    switch (object.type) {
+        case google.maps.drawing.OverlayType.MARKER :
+            object.position = figure.getPosition();
+            break;
+        case google.maps.drawing.OverlayType.POLYLINE :
+        case google.maps.drawing.OverlayType.POLYGON :
+            object.path = figure.getPath().getArray();
+            break;
+        case google.maps.drawing.OverlayType.RECTANGLE :
+            object.bounds = figure.getBounds();
+            break;
+        case google.maps.drawing.OverlayType.CIRCLE :
+            object.center = figure.getCenter();
+            object.radius = figure.getRadius();
+            break;
     }
 
     console.log(JSON.stringify(object));

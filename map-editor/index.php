@@ -7,17 +7,17 @@ $user = new User();
 <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-    <link rel="StyleSheet" type="text/css" href="css/map.css"/>
-    <link rel="stylesheet" href="css/bootstrap.min.css">
 
-    <script
-        src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=true&language=ru&libraries=places,panoramio,drawing"
-        type="text/javascript"></script>
-    <script src="js/map.js" type="text/javascript"></script>
-    <script src="js/jquery.js" type="text/javascript"></script>
-    <script src="js/bootstrap.min.js" type="text/javascript"></script>
     <title>Map</title>
 
+    <script src="js/jquery.js" type="text/javascript"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=true&language=ru&libraries=places,panoramio,drawing"
+            type="text/javascript"></script>
+    <script src="js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="js/map.js" type="text/javascript"></script>
+
+    <link rel="StyleSheet" type="text/css" href="css/map.css"/>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
 </head>
 <body onload="initialize();">
 <div id="toolbar">
@@ -47,16 +47,16 @@ $user = new User();
                     class="btn btn-tool glyphicon glyphicon-certificate"></button>
         </p>
         <p>
-            <button disabled="disabled" id="description" title="add a description" type="button"
+            <button id="infowindow" title="add a description" type="button"
                     class="btn btn-tool glyphicon glyphicon-comment"></button>
         </p>
         <p>
-            <button disabled="disabled" id="photo" title="attach a photo" type="button"
-                    class="btn btn-tool glyphicon glyphicon-camera"></button>
+            <button id="photo" title="attach a photo" type="button"
+                    class="btn btn-tool glyphicon glyphicon-camera" data-toggle="modal" data-target="#img-window"></button>
         </p>
         <p>
-            <button disabled="disabled" id="kml" title="load gps track" type="button"
-                    class="btn btn-tool glyphicon glyphicon-phone"></button>
+            <button id="kml" title="load gps track" type="button"
+                    class="btn btn-tool glyphicon glyphicon-phone" data-toggle="modal" data-target="#gps-window"></button>
         </p>
     </div>
     <hr>
@@ -103,14 +103,14 @@ $user = new User();
 <ul id="dropdown-menu" class="dropdown-menu" role="menu">
     <li role="presentation"><a id="dropdown-menu-a" role="menuitem" tabindex="-1" href="#">Delete marker</a></li>
 </ul>
+
 <?php if (!$user->isLoggedIn()) { ?>
-    <div class="modal fade" id="sign-in-window" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-         aria-hidden="true">
+    <div class="modal fade" id="sign-in-window" tabindex="-1" role="dialog" aria-labelledby="signinLabel" aria-hidden="true">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="myModalLabel">Welcome!</h4>
+                    <h4 class="modal-title" id="signinLabel">Welcome!</h4>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
@@ -136,5 +136,42 @@ $user = new User();
         </div>
     </div>
 <?php } ?>
+
+<div class="modal fade" id="gps-window" tabindex="-1" role="dialog" aria-labelledby="gpsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="gpsLabel">Add GPS track</h4>
+            </div>
+            <div class="modal-body">
+                <input type="file" id="gps-input">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="sign-in">Add track</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="img-window" tabindex="-1" role="dialog" aria-labelledby="imgLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="imgLabel">Add image</h4>
+            </div>
+            <div class="modal-body">
+                <input type="file" id="img-input">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="sign-in">Add image</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>	
